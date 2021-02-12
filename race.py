@@ -24,23 +24,37 @@ def create_line(data):
 
   return line
 
-def get_track_abbrevs():
+def mystrip(string, char=" "):
   """
-  Simple function to get all abbreviations of tracks
+  For map in get_tracks() function
+  """
+  return string.strip(char)
+
+def get_tracks():
+  """
+  Simple function to get all tracks as dictionary as abbreviation -> full name
   """
   data = pandas.read_csv("tracks.csv", delimiter=",")
   abbrevs = data["Abbreviation"]
+  full = data[" FullName"]
+  
+  full_lst = list(full)
 
-  return list(abbrevs)  # make into list
+  full_lst_stripped = list(map(mystrip, full_lst))
+
+  # make into lists and then dictionary
+  tracks = dict(zip(list(abbrevs), full_lst_stripped))
+
+  return tracks
 
 def setup():
-  n_ok  # check if number of races acceptable
+  n_ok = False  # check if number of races acceptable
   while (not n_ok):
     n_races = int(input("Number of races: "))
     if ((n_races > 3) and (n_races < 49)):
       n_ok = True
     else:
-      print(f"Unacceptable number of races: {n_races}. Must be between 4 and 48").
+      print(f"Unacceptable number of races: {n_races}. Must be between 4 and 48.")
   
   fname = input("Name of file (defaults to current date if left blank): ")
   # TODO(Justus) add functionality for who is playing
@@ -65,13 +79,17 @@ def update(i):
   Regular Updating function for every race
   Returns the new line to be added
   """
-  print(f"Race {i+1}.")
+  print(f"\nRace {i+1}.")
   track_ok = False  # check if acceptable track
-  tracks = get_track_abbrevs()
+  tracks = get_tracks()
   while(not track_ok):
     track = input("Enter Track: ")
-    if (track in tracks):  # is it an allowed abbreviation
-      track_ok = True
+    if (track in tracks):  # allowed abbreviation, since abbrevs are keys in dict
+      acc = input(f"Logging as {tracks[track]}. Is this correct? [y/n]: ")
+      if (acc == "y"):  # allow for changing track if typo
+        track_ok = True
+      else:
+        print("Ok. Try again.\n")
     else:
       print(f"Unknown track abbreviation: \"{track}\". Please try again.")
   
