@@ -34,7 +34,14 @@ def get_track_abbrevs():
   return list(abbrevs)  # make into list
 
 def setup():
-  n_races = int(input("Number of races: "))
+  n_ok  # check if number of races acceptable
+  while (not n_ok):
+    n_races = int(input("Number of races: "))
+    if ((n_races > 3) and (n_races < 49)):
+      n_ok = True
+    else:
+      print(f"Unacceptable number of races: {n_races}. Must be between 4 and 48").
+  
   fname = input("Name of file (defaults to current date if left blank): ")
   # TODO(Justus) add functionality for who is playing
 
