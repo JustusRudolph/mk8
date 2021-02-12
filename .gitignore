@@ -1,6 +1,3 @@
-# own additions
-comps/  # this is the folder with all the runs, might become big fast
-
 ######## BELOW HERE ARE JUST REGULAR PYTHON GITIGNORES ########
 # Byte-compiled / optimized / DLL files
 __pycache__/
