@@ -7,6 +7,8 @@ PATH_TO_TRACK_DICT = "../data/tracks.csv"  # path to tracks csv file
 PATH_TO_COMPS = "../.comps/"  # path to competition directory
 ALLOWED_N_RACES=[4, 6, 8, 12, 16, 24, 32, 48]  # which number of races allowed
 NAMES = ["Henry", "Justus", "Lukas"]
+red_blue_ACTIVE_ = False  # track red and blue shells
+
 
 def add_line(ln, filename):
   with open(filename, "a") as f:
@@ -87,6 +89,9 @@ def setup(relative_path=PATH_TO_COMPS):
   [race.write(", " + name) for name in names]  # add names to column headers
   race.close()
 
+  global red_blue_ACTIVE_
+  red_blue_ACTIVE_ = "y" == input("Do you want to track the " +
+                                  "number of red and blue shells?[y/n]: ")
   return names, n_races, path
 
 def race_data(names, i, dict_path = PATH_TO_TRACK_DICT):
@@ -118,6 +123,21 @@ def race_data(names, i, dict_path = PATH_TO_TRACK_DICT):
     else:
       print("Those results are not acceptable. Must be between 1 and 12.")
   
+  #print(red_blue_ACTIVE_)
+  #input()
+  if (red_blue_ACTIVE_):
+    rb_ok = False
+    while (not rb_ok):
+      reds = [int(red) for red in input(f"Red shells for {str(names)[1:-1]}: ").split()]
+      blues = [int(blue) for blue in input(f"Blue Shells for {str(names)[1:-1]}: ").split()]
+      shells = dict(zip(names, zip(reds, blues)))
+      rb_ok = "y" == input(f"We have: {shells}.\nIs this correct?[y/n] ")
+      if (not rb_ok):
+        print("Ok, try again.\n")
+    
+    # get full results: place, reds, blues
+    results = [[results[i]] + list(shells[names[i]]) for i in range(len(names))] 
+
   data = [track]
   data += results
 
