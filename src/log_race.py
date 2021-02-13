@@ -29,7 +29,7 @@ def get_tracks():
   Simple function to get all tracks as dictionary as abbreviation -> full name
   """
   # Engine Python because otherwise can't have two char separation
-  data = pandas.read_csv("tracks.csv", sep=", ", engine="python")
+  data = pandas.read_csv("data/tracks.csv", sep=", ", engine="python")
   abbrevs = data["Abbreviation"]
   full = data["FullName"]
   
