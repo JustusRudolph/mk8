@@ -28,7 +28,7 @@ def create_line(data):
   for i in range(n):
     line += str(data[i])
     if (i != n-1):
-      line += ", "
+      line += "; "  # delimiter
 
   return line
 
@@ -80,7 +80,7 @@ def setup(relative_path=PATH_TO_COMPS):
 
   race = open(path, "w")
   race.write("Track")  # first column are the tracks
-  [race.write(", " + name) for name in names]  # add names to column headers
+  [race.write("; " + name) for name in names]  # add names to column headers
   race.close()
 
   global red_blue_ACTIVE_

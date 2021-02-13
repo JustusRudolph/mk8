@@ -1,5 +1,6 @@
 import pandas
 import numpy as np
+import ast  # list in string representation to list
 
 # define main dictionary
 PLACE_POINT = {1:15, 2:12, 3:10, 4:9, 5:8, 6:7, 7:6, 8:5, 9:4, 10:3, 11:2, 12:1}
@@ -8,7 +9,8 @@ def get_data(path):
   """
   Returns the data from the given path
   """
-  full_data = pandas.read_csv(path, sep=", ", engine="python")
+  # use semicolon to avoid clash with normal list
+  full_data = pandas.read_csv(path, sep="; ", engine="python")
   return full_data
   
 def check_names(path, names):
@@ -33,7 +35,7 @@ def get_points(places):
   tot = sum([PLACE_POINT[place] for place in places])
   return tot
 
-def get_all_positions(paths, names):
+def get_all_name_data(paths, names):
   """
   Appends all the runs to each other to create larger data sets
   """
@@ -44,7 +46,8 @@ def get_all_positions(paths, names):
   for path in paths:
     full_data = get_data(path)
     for name in names:
-      name_data[name] += list(full_data[name])
+      # ast used to make string to list representation
+      name_data[name] += list(ast.literal_eval(entry) for entry in full_data[name])
 
   # make into np arrays
   for name in names:
