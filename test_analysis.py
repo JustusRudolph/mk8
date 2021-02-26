@@ -34,11 +34,11 @@ def main():
     print(f"{name} got {pts} points. Hit by red {n_reds} times. Hit by blue {n_blues} times.")
 
   
-  tot_avgs = st.get_avgs(name_data)
-  tot_stddevs = st.get_std_devs(name_data)
+  tot_avgs = st.get_avgs(name_data, tracks, "ea")
+  tot_stddevs = st.get_std_devs(name_data, tracks, "ea")
 
   print()  # newline
   for name in names:
-    print(f"{name} had average position: {tot_avgs[name]} with standard deviation {tot_stddevs[name]}")
+    print(f"{name} had average position: {tot_avgs[name]:.2f} with standard deviation {tot_stddevs[name]:.2f}")
   
 main()
