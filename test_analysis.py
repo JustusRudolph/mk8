@@ -27,6 +27,8 @@ def main():
 
   tracks, name_data = rd.get_all_name_data(runs_with_redblues, names)
 
+  #_, name_data_today = rd.get_all_name_data(runs_today, names)
+
   print("All data:")
   for name in names:
     # column 0 is place, 1 is reds, 2 is blues
@@ -38,6 +40,7 @@ def main():
     print(f"{name} got {pts} points. Hit by red {n_reds} times. Hit by blue {n_blues} times.")
 
   print()
+  input()
   distinct_tracks = list(set(tracks))
   # check for best tracks for each person
   best_tracks, best_pos = st.get_best_track(name_data, tracks, distinct_tracks)
@@ -57,11 +60,12 @@ def main():
 
   print(f"Most played track(s): {common_tracks_full}")
   
-  avg_sl = st.get_avgs(name_data, tracks, "sl")
+  ex = "ccb"
+  avg_example = st.get_avgs(name_data, tracks, ex)
   print()
-  print("Sherbet Land: ")
+  print(f"{all_tracks[ex]}")
   for name in names:
-    print(f"{name} got on average position {avg_sl[name]} in Sherbet Land.")
+    print(f"{name} got on average position {avg_example[name]} in {all_tracks[ex]}.")
   
 
 main()
