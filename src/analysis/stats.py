@@ -1,5 +1,7 @@
 import numpy as np
 from statistics import mode
+import matplotlib.pyplot as plt
+
 
 def get_avgs(name_data, tracks = [], track = 0):
   """
@@ -99,5 +101,31 @@ def get_n_most_occuring(lst, n=1):
       i += 1  # increment for every element returned
 
   return most_occ
+
+def plot_occurences(lst):
+  """
+  Takes a list/array and plots the number occurences
+  of elements in the list
+  """
+  lst = list(lst)  # ensure list to enable counting
+  distinct_elems = list(set(lst))
+  ns = []  # list of numbers of tracks
+  for elem in distinct_elems:
+    n = lst.count(elem)
+    ns.append(n)
+
+  distinct_ns = list(set(ns))
+  freqs = [] # frequency of certain occurence of tracks
+
+  for n in distinct_ns:
+    freqs.append(ns.count(n))
+
+  # have freqs and distinct_ns now as dependend/independent
+  plt.plot(distinct_ns, freqs, "o")
+  plt.xlabel("Track Occurence")
+  plt.ylabel("Frequency")
+  plt.title("Frequency sketch: Frequency of number of track occurences.")
+  plt.show()
+
 
 

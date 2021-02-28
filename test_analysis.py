@@ -13,6 +13,7 @@ from src.analysis import stats as st
 COMPS_PATH = "src/.comps/"
 
 def main():
+  today_only = False
   all_runs = [COMPS_PATH + run for run in os.listdir(COMPS_PATH)]  # all paths
   all_tracks = lr.get_tracks("src/data/tracks.csv")  # dictionary of tracks
 
@@ -27,7 +28,8 @@ def main():
 
   tracks, name_data = rd.get_all_name_data(runs_with_redblues, names)
 
-  #_, name_data_today = rd.get_all_name_data(runs_today, names)
+  if (today_only):
+    tracks, name_data = rd.get_all_name_data(runs_today, names)
 
   print("All data:")
   for name in names:
@@ -66,6 +68,8 @@ def main():
   print(f"{all_tracks[ex]}")
   for name in names:
     print(f"{name} got on average position {avg_example[name]} in {all_tracks[ex]}.")
-  
+ 
+  if (input("\nDo you want to view the frequency plot?[y/n]: ") == "y"):
+    st.plot_occurences(tracks)
 
 main()
