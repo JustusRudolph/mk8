@@ -38,19 +38,23 @@ def get_points(places):
 def get_all_name_data(paths, names):
   """
   Appends all the runs to each other to create larger data sets
+  returns the array of all tracks, and a dictionary of name to positions
   """
+  tracks = []
   name_data = {}
   for name in names:
     name_data[name] = []  # empty list to be appended
 
   for path in paths:
     full_data = get_data(path)
+    tracks += list(full_data["Track"])
     for name in names:
       # ast used to make string to list representation
       name_data[name] += list(ast.literal_eval(entry) for entry in full_data[name])
 
   # make into np arrays
+  tracks = np.array(tracks)
   for name in names:
     name_data[name] = np.array(name_data[name])
 
-  return name_data
+  return tracks, name_data
