@@ -102,10 +102,12 @@ def get_n_most_occuring(lst, n=1):
 
   return most_occ
 
-def plot_occurences(lst):
+def plot_occurences(lst, n_max=48):
   """
   Takes a list/array and plots the number occurences
   of elements in the list
+  n_max is the number of max distinct elements in lst. The value 48 comes
+  from 48 distinct tracks.
   """
   lst = list(lst)  # ensure list to enable counting
   distinct_elems = list(set(lst))
@@ -119,6 +121,11 @@ def plot_occurences(lst):
 
   for n in distinct_ns:
     freqs.append(ns.count(n))
+
+  if (sum(freqs) < n_max):
+    f_zero = n_max - sum(freqs)
+    freqs.insert(0, f_zero)
+    distinct_ns.insert(0, 0)
 
   # have freqs and distinct_ns now as dependend/independent
   plt.plot(distinct_ns, freqs, "o")

@@ -31,7 +31,9 @@ def main():
   if (today_only):
     tracks, name_data = rd.get_all_name_data(runs_today, names)
 
-  print("All data:")
+  n_races = len(tracks)
+
+  print(f"Number of races: {n_races}")
   for name in names:
     # column 0 is place, 1 is reds, 2 is blues
     # make it rows so numpy is happy and it looks neat
@@ -39,7 +41,8 @@ def main():
     pts = rd.get_points(name_data[name].transpose()[0])
     n_reds = sum(name_data[name].transpose()[1])
     n_blues = sum(name_data[name].transpose()[2])
-    print(f"{name} got {pts} points. Hit by red {n_reds} times. Hit by blue {n_blues} times.")
+    print(f"{name} got {pts} points. Average: {pts/float(n_races):.2f}. "+
+          f"Hit by red {n_reds} times. Hit by blue {n_blues} times.")
 
   print()
   input()
@@ -62,6 +65,14 @@ def main():
 
   print(f"Most played track(s): {common_tracks_full}")
   
+  not_played_yet = []
+  for track in all_tracks:
+    n_occs = list(tracks).count(track)
+    if (not n_occs):
+      not_played_yet.append(all_tracks[track])
+
+  print(f"Did not play the following track(s): {not_played_yet}")
+
   ex = "ccb"
   avg_example = st.get_avgs(name_data, tracks, ex)
   print()
