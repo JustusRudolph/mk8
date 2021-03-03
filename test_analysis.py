@@ -58,7 +58,7 @@ def main():
 
 
   print()
-  common_tracks = st.get_n_most_occuring(tracks, 1)
+  common_tracks = st.get_n_most_occuring(tracks, 5)
   common_tracks_full = {}
   for key in common_tracks.keys():
     common_tracks_full[all_tracks[key]] = common_tracks[key]
