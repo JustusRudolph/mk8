@@ -6,43 +6,48 @@ import matplotlib.pyplot as plt
 def get_avgs(name_data, tracks = [], track = 0):
   """
   Gets the averages for the given players.
-  Returns dictionary with names as keys, averages as values.
+  Returns dictionary with names -> averages (pos, reds, blues).
   If a certain track is given, that is checked specifically.
   """
   avgs = {}
   names = name_data.keys()
   for name in names:
     if (track and len(tracks)):  # only if both are given we check for specific track
-      ii = np.where(tracks == track)[0]  # get indices of track
+      ii = np.where(np.array(tracks) == track)[0]  # get indices of track
       # get positions for those indices and that name
       data = np.array([name_data[name][i] for i in range(len(name_data[name])) if i in ii])
 
     else:
       data = name_data[name]
     
-    avg = np.average(data.transpose()[0])
-    avgs[name] = avg
+    avg = []
+    for i in range(3):   # TODO: len(name_data[name][0]), check what this is
+      avg.append(np.average(data.transpose()[i]))
+    avgs[name] = avg  # now [avg_pos, avg_reds, avg_blues]
 
   return avgs
 
 def get_std_devs(name_data, tracks = [], track = 0):
   """
   Gets the standard deviations for the given players.
-  Returns dictionary with names as keys, standard deviations as values.
+  Returns dictionary with names -> standard deviations (pos, reds, blues).
   If a certain track is given, that is checked specifically.
   """
   stdds = {}
   names = name_data.keys()
   for name in names:
     if (track and len(tracks)):  # only if both are given we check for specific track
-      ii = np.where(tracks == track)[0]  # get indices of track
+      ii = np.where(np.array(tracks) == track)[0]  # get indices of track
       # get positions for those indices and that name
       data = np.array([name_data[name][i] for i in range(len(name_data[name])) if i in ii])
 
     else:
       data = name_data[name]
     
-    stdd = np.std(data.transpose()[0])
+    stdd = []
+    for i in range(3):  # TODO check len(name_data[name][0])
+      stdd.append(np.std(data.transpose()[i]))
+    
     stdds[name] = stdd
 
   return stdds
@@ -60,7 +65,9 @@ def get_best_track(name_data, tracks, tracks_check):
   names = name_data.keys()
   for track in tracks_check:
     avgs = get_avgs(name_data, tracks, track)
-    avgs_per_track[track] = avgs
+    avgs_per_track[track] = {}  # initialise empty
+    for name in names:  # write avg position for each name for that track
+      avgs_per_track[track][name] = avgs[name][0]
     
   
   mins = {}
@@ -75,12 +82,12 @@ def get_best_track(name_data, tracks, tracks_check):
                          mn - avgs_per_track[track][name]) <= eps]
   
 
-  return(best_tracks, mins)
+  return (best_tracks, mins)
 
 def get_n_most_occuring(lst, n=1):
   """
   Gets the n most occuring objects in list (or more if there are duplicates)
-  Returns dictionary of object in list to number of occurences.
+  Returns dictionary of object (from lst) -> number of its occurences in lst.
   """
   lst = list(lst)  # assert that it is a list not a numpy array
   assert(n <= len(lst))
@@ -102,37 +109,47 @@ def get_n_most_occuring(lst, n=1):
 
   return most_occ
 
-def plot_occurences(lst, n_max=48):
+def plot_occurences(lst, plot_tracks=False, typ="position"):
   """
   Takes a list/array and plots the number occurences
   of elements in the list
-  n_max is the number of max distinct elements in lst. The value 48 comes
-  from 48 distinct tracks.
+  plot_tracks is to see how many tracks have not been played. Hence
+  this is set to true if tracks are to be plotted
   """
   lst = list(lst)  # ensure list to enable counting
   distinct_elems = list(set(lst))
-  ns = []  # list of numbers of tracks
+  ns = []  # list of occurence of certain element
   for elem in distinct_elems:
     n = lst.count(elem)
     ns.append(n)
 
-  distinct_ns = list(set(ns))
-  freqs = [] # frequency of certain occurence of tracks
 
-  for n in distinct_ns:
-    freqs.append(ns.count(n))
 
-  if (sum(freqs) < n_max):
-    f_zero = n_max - sum(freqs)
-    freqs.insert(0, f_zero)
-    distinct_ns.insert(0, 0)
+  if (plot_tracks):
+    distinct_ns = list(set(ns))
+    freqs = [] # frequency of certain occurence of elements
 
-  # have freqs and distinct_ns now as dependend/independent
-  plt.plot(distinct_ns, freqs, "o")
-  plt.xlabel("Track Occurence")
-  plt.ylabel("Frequency")
-  plt.title("Frequency sketch: Frequency of number of track occurences.")
-  plt.show()
+    for n in distinct_ns:
+      freqs.append(ns.count(n))
 
+    if (sum(freqs) < 48):
+      f_zero = 48 - sum(freqs)
+      freqs.insert(0, f_zero)
+      distinct_ns.insert(0, 0)
+
+    # have freqs and distinct_ns now as dependend/independent
+    # This is for tracks only, which are not numbers
+    plt.plot(distinct_ns, freqs, "o")
+    plt.xlabel(f"Occurence of {typ}")
+    plt.ylabel("Frequency")
+    plt.title(f"Frequency sketch: Frequency of number of {typ} occurences.")
+    plt.show()
+
+  else:
+    plt.plot(distinct_elems, ns, "o")
+    plt.xlabel(f"Occurence of {typ}")
+    plt.ylabel("Frequency")
+    plt.title(f"Frequency sketch: Frequency of number of {typ} occurences.")
+    plt.show()
 
 

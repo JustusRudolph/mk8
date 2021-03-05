@@ -35,25 +35,35 @@ def get_points(places):
   tot = sum([PLACE_POINT[place] for place in places])
   return tot
 
-def get_all_name_data(paths, names):
+def get_all_name_data(paths, names=None):
   """
   Appends all the runs to each other to create larger data sets
   returns the array of all tracks, and a dictionary of name to positions
   """
   tracks = []
   name_data = {}
-  for name in names:
-    name_data[name] = []  # empty list to be appended
+  names_init = False  # to check whether name entries in dictionary exists
+
+  if (names is not None):
+    names_init = True  # names initialised
+    for name in names:
+      name_data[name] = []  # initialise empty list for each name to which append data
 
   for path in paths:
     full_data = get_data(path)
+    if (not names_init):
+      headers = full_data.columns
+      names = headers[1:]  # first will be track, from then on it's names
+      for name in names:
+        name_data[name] = []  # empty list initialised for every name
+
+      names_init = True
+
     tracks += list(full_data["Track"])
     for name in names:
       # ast used to make string to list representation
       name_data[name] += list(ast.literal_eval(entry) for entry in full_data[name])
 
-  # make into np arrays
-  tracks = np.array(tracks)
   for name in names:
     name_data[name] = np.array(name_data[name])
 
