@@ -44,7 +44,7 @@ class Analysis:
         for name in self.names:
           print(f"{name} got {data[name][0]} points. Hit by red " +
           f"{data[name][1]} times. Hit by blue {data[name][2]} times.")
-          print("This corresponds to averages of: Position: "+
+          print("This corresponds to averages of: Score: "+
                 f"{data_per_game[name][0]:.2f}, Reds: {data_per_game[name][1]:.2f}"+
                 f", Blues: {data_per_game[name][2]:.2f}.\n")
         

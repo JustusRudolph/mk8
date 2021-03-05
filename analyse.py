@@ -17,7 +17,7 @@ def get_runs(today_only=False):
   today = str(date.today())
 
   if (today_only):
-    runs = [run for run in all_runs if today in run]
+    runs = [run for run in runs if today in run]
 
   return runs
 
