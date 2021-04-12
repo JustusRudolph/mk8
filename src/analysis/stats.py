@@ -52,11 +52,12 @@ def get_std_devs(name_data, tracks = [], track = 0):
 
   return stdds
 
-def get_best_track(name_data, tracks, tracks_check):
+def get_best_worst_track(name_data, tracks, tracks_check, best=True):
   """
-  Returns the best track for each player as a dictionary: name -> track
+  Returns the best/worst track for each player as a dictionary: name -> track
   Returns the position for that player as dictionary: name -> position
   Takes data for each player, corresponding tracks, and which tracks to check for.
+  The last bool states whether to check for best or worst track
   """
   eps = 1e-6  # this is to account for rounding errors when equating later
   avgs_per_track = {}  # this will contain all avgs for each tracks to check for
@@ -69,20 +70,26 @@ def get_best_track(name_data, tracks, tracks_check):
     for name in names:  # write avg position for each name for that track
       avgs_per_track[track][name] = avgs[name][0]
     
-  
-  mins = {}
-  # get all minimum values for each name
-  for name in names:
-    mins[name] = (min([avgs_per_track[track][name] for track in tracks_check]))
+  min_max = {}
+  if (best):
+    # get minimum avg osition for each name
+    for name in names:
+      min_max[name] = min([avgs_per_track[track][name] for track in tracks_check])
 
-  # get tracks for which we get this minimum
+  else:  # so if we want worst
+    # get maximum avg position for each name
+    for name in names:
+      min_max[name] = (max([avgs_per_track[track][name] for track in tracks_check]))
+
+  
+  # get tracks for which we get this min/max position
   for name in names:
-    mn = mins[name]
+    mn = min_max[name]
     best_tracks[name] = [track for track in tracks_check if abs(
-                         mn - avgs_per_track[track][name]) <= eps]
-  
+                        mn - avgs_per_track[track][name]) <= eps]
 
-  return (best_tracks, mins)
+
+  return (best_tracks, min_max)  # best_tracks can be "worst tracks" too
 
 def get_n_most_occuring(lst, n=1):
   """

@@ -53,21 +53,27 @@ class Analysis:
     else:
       return data, data_per_game
 
-  def get_fav_tracks(self, print_enabled=False):
+  def get_fav_tracks(self, print_enabled=False, best=True):
     """
     Gets the favourite tracks of each player. Also here,
     the user can select to print or not. If user decides
     to print, nothing will be returned.
+
+    best bool checks if we want to find best or worst tracks
     """
     distinct_tracks = list(set(self.tracks))
     # check for best tracks for each person
-    best_tracks, pos = st.get_best_track(self.name_data, 
-                                         self.tracks, distinct_tracks)
+    best_tracks, pos = st.get_best_worst_track(self.name_data, self.tracks,
+                                              distinct_tracks, best=best)
     if (print_enabled):
       for name in self.names:
         fav_tracks = [self.track_dict[track] for track in best_tracks[name]]
-        print(f"The favourite track(s) of {name}, with an average position"+
-            f" of {pos[name]:.2f} are: {fav_tracks}.")
+        to_print = "The "
+        if (not best):
+          to_print += "least "
+        to_print += f"favourite track(s) of {name}, with an average position"
+        to_print += f" of {pos[name]:.2f} are: {fav_tracks}."
+        print(to_print)
     
       print("\n")  # add double newline at the end
 
