@@ -1,4 +1,5 @@
 """
+
 This file is for testing the calculations from calc and advanced calc
 """
 import os  # for directory listing
@@ -17,7 +18,7 @@ def get_runs(today_only=False):
   today = str(date.today())
 
   if (today_only):
-    runs = [run for run in all_runs if today in run]
+    runs = [run for run in runs if today in run]
 
   return runs
 
@@ -27,7 +28,7 @@ def get_all_tracks():
 
 def print_prompts():
   total_string =  "Get data for each player:                        [1]\n"
-  total_string += "Get favourite tracks for each player:            [2]\n"
+  total_string += "Get favourite and least favourite tracks:        [2]\n"
   total_string += "Get the most frequent tracks:                    [3]\n"
   total_string += "Get which tracks have been played/not played:    [4]\n"
   total_string += "Get the average and standard deviation of full\n"
@@ -63,7 +64,8 @@ def run(analyse):
       analyse.get_total_name_data(print_enabled=True)
 
     elif (choice == '2'):
-      analyse.get_fav_tracks(print_enabled=True)
+      analyse.get_fav_tracks(print_enabled=True, best=True)
+      analyse.get_fav_tracks(print_enabled=True, best=False)
 
     elif (choice == '3'):
       # TODO(Justus) Check that only ints are accepted
