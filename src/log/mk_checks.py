@@ -1,6 +1,7 @@
 # This is a simple helper file to fulfill several conditions
 
 ALLOWED_N_RACES=[4, 6, 8, 12, 16, 24, 32, 48]  # which number of races allowed
+ALLOWED_CC = [50, 100, 150, 200]  # CC that is possible
 
 
 def check_position(pos):
@@ -34,6 +35,42 @@ def run_n_races():
             f"Must be one of {ALLOWED_N_RACES}.")
   
   return n_races
+
+def run_cc():
+  """
+  Asks the user for which cc the race is played at (if online) or what cc all races are played
+  at if offline. It then returns the cc and a mirror flag
+  """
+  cc_accepted = False
+  cc = 0
+  is_mirror = False
+
+  while (not cc_accepted):
+    cc = int(input("Which cc: "))
+    if (cc in ALLOWED_CC):
+      cc_accepted = True
+    else:
+      print(f"Not accepted, must be one of: {ALLOWED_CC}")
+
+  if (cc == 150):
+    mirror = input("Mirror?[y/n]: ")
+    if (mirror == 'y'):
+      is_mirror = True
+
+  return (cc, is_mirror)
+
+def run_avg_rat():
+  """
+  This is strictly for online playing. Just requests the average rating
+  of opponents and checks if it is an integer.
+  """
+  while (True):
+    rat = input("What is the average rating? ")
+    try: 
+        int(rat)
+        return int(rat)
+    except ValueError:
+        print(f"{rat} is not a number. Try again.")  # catch this
 
 def run_tracks(tracks):
   """

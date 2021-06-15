@@ -6,7 +6,6 @@ import pandas
 from . import mk_checks as chk
 
 ALLOWED_N_RACES=[4, 6, 8, 12, 16, 24, 32, 48]  # which number of races allowed
-ALLOWED_CC = [50, 100, 150, 200]  # CC that is possible
 NAMES = ["Henry", "Justus", "Lukas"]
 red_blue_ACTIVE_ = False  # track red and blue shells
 
@@ -46,6 +45,7 @@ def get_tracks(dict_path):
 
   return tracks
 
+
 def setup(relative_path, is_online=False):
   """
   All initial setup. Creates logging file.
@@ -76,22 +76,11 @@ def setup(relative_path, is_online=False):
     fname += str(date) + "_" + str(now.hour) + ":" + str(now.minute)
 
   if (not is_online):  # only check which CC if not online
-    cc_accepted = False
-    cc = 0
-    while (not cc_accepted):
-      cc = int(input("Which cc: "))
-      if (cc in ALLOWED_CC):
-        cc_accepted = True
-      else:
-        print(f"Not accepted, must be one of: {ALLOWED_CC}")
+    cc, is_mirror = chk.run_cc()
 
     fname += "_"
     fname += str(cc)
-
-    if (cc = 150):
-      mirror = input("Mirror?[y/n]: ")
-      if (mirror == 'y'):
-        fname += "M"  # so we know if it's mirror
+    fname += "M" * is_mirror  # add M in case of mirror
 
   fname += ".csv"
 
@@ -106,7 +95,7 @@ def setup(relative_path, is_online=False):
   race.write("Track")  # first column are the tracks
 
   if (is_online):
-    race.write("; CC; AvgRating")  # these two fields are not necessary offline
+    race.write("; CC; Mirror; AvgRating")  # these fields are not necessary offline
 
   [race.write("; " + name) for name in names]  # add names to column headers
   race.close()
@@ -116,23 +105,33 @@ def setup(relative_path, is_online=False):
                                   "number of red and blue shells?[y/n]: ")
   return names, n_races, path
 
-def race_data(names, i, dict_path):
+def race_data(names, i, dict_path, is_online=False):
   """
   Regular Updating function for every race
   Returns the data for the new line to be added
   """
   print(f"\nRace {i+1}.")
   tracks = get_tracks(dict_path)
+
   track = chk.run_tracks(tracks)
+  data = [track]
+
+  if (is_online):  # Three fields only used in online
+    cc, is_mirror = chk.run_cc()
+    avg_rat = chk.run_avg_rat()
+    
+    data.append(cc)
+    data.append(int(is_mirror))
+    data.append(avg_rat)
+
 
   results = chk.run_results(names)
   
   if (red_blue_ACTIVE_):
     shells = chk.run_RB_shells(names)
     # get full results: place, reds, blues
-    results = [[results[i]] + list(shells[names[i]]) for i in range(len(names))] 
+    results = [[results[i]] + list(shells[names[i]]) for i in range(len(names))]
 
-  data = [track]
   data += results
 
   return data  # full line
