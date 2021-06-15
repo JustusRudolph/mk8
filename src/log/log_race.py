@@ -8,6 +8,7 @@ from . import mk_checks as chk
 PATH_TO_TRACK_DICT = "../data/tracks.csv"  # path to tracks csv file
 PATH_TO_COMPS = "../.comps/"  # path to competition directory
 ALLOWED_N_RACES=[4, 6, 8, 12, 16, 24, 32, 48]  # which number of races allowed
+ALLOWED_CC = [50, 100, 150, 200]  # CC that is possible
 NAMES = ["Henry", "Justus", "Lukas"]
 red_blue_ACTIVE_ = False  # track red and blue shells
 
@@ -73,6 +74,18 @@ def setup(relative_path=PATH_TO_COMPS):
     date = datetime.date.today()    
     now = datetime.datetime.now()
     fname += str(date) + "_" + str(now.hour) + ":" + str(now.minute)
+
+  cc_accepted = False
+  cc = 0
+  while (not cc_accepted):
+    cc = int(input("Which cc: "))
+    if (cc in ALLOWED_CC):
+      cc_accepted = True
+    else:
+      print(f"Not accepted, must be one of: {ALLOWED_CC}")
+
+  fname += "_"
+  fname += str(cc)
 
   fname += ".csv"
   
