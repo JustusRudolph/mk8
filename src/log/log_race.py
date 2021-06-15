@@ -5,10 +5,7 @@ import pandas
 
 from . import mk_checks as chk
 
-PATH_TO_TRACK_DICT = "../data/tracks.csv"  # path to tracks csv file
-PATH_TO_COMPS = "../.comps/"  # path to competition directory
 ALLOWED_N_RACES=[4, 6, 8, 12, 16, 24, 32, 48]  # which number of races allowed
-ALLOWED_CC = [50, 100, 150, 200]  # CC that is possible
 NAMES = ["Henry", "Justus", "Lukas"]
 red_blue_ACTIVE_ = False  # track red and blue shells
 
@@ -48,7 +45,8 @@ def get_tracks(dict_path):
 
   return tracks
 
-def setup(relative_path=PATH_TO_COMPS):
+
+def setup(relative_path, is_online=False):
   """
   All initial setup. Creates logging file.
   
@@ -60,7 +58,9 @@ def setup(relative_path=PATH_TO_COMPS):
   n_races: number of races
   path: path to directory to which to write
   """
-  n_races = chk.run_n_races()
+  n_races = 1  # necessary for checking if online in log()
+  if (not is_online):
+    n_races = chk.run_n_races()
 
   names = input("Names of racers (defaults to \'Henry\', \'Justus\', " +
                 "\'Lukas\' if left blank):\n").split()
@@ -75,24 +75,28 @@ def setup(relative_path=PATH_TO_COMPS):
     now = datetime.datetime.now()
     fname += str(date) + "_" + str(now.hour) + ":" + str(now.minute)
 
-  cc_accepted = False
-  cc = 0
-  while (not cc_accepted):
-    cc = int(input("Which cc: "))
-    if (cc in ALLOWED_CC):
-      cc_accepted = True
-    else:
-      print(f"Not accepted, must be one of: {ALLOWED_CC}")
+  if (not is_online):  # only check which CC if not online
+    cc, is_mirror = chk.run_cc()
 
-  fname += "_"
-  fname += str(cc)
+    fname += "_"
+    fname += str(cc)
+    fname += "M" * is_mirror  # add M in case of mirror
 
   fname += ".csv"
+
+  if (is_online):
+    relative_path += "_online/"
+  else:
+    relative_path += "/"  # the slash is important bro
   
   path = relative_path + fname
 
   race = open(path, "w")
   race.write("Track")  # first column are the tracks
+
+  if (is_online):
+    race.write("; CC; Mirror; AvgRating")  # these fields are not necessary offline
+
   [race.write("; " + name) for name in names]  # add names to column headers
   race.close()
 
@@ -101,35 +105,49 @@ def setup(relative_path=PATH_TO_COMPS):
                                   "number of red and blue shells?[y/n]: ")
   return names, n_races, path
 
-def race_data(names, i, dict_path = PATH_TO_TRACK_DICT):
+def race_data(names, i, dict_path, is_online=False):
   """
   Regular Updating function for every race
   Returns the data for the new line to be added
   """
   print(f"\nRace {i+1}.")
   tracks = get_tracks(dict_path)
+
   track = chk.run_tracks(tracks)
+  data = [track]
+
+  if (is_online):  # Three fields only used in online
+    cc, is_mirror = chk.run_cc()
+    avg_rat = chk.run_avg_rat()
+    
+    data.append(cc)
+    data.append(int(is_mirror))
+    data.append(avg_rat)
+
 
   results = chk.run_results(names)
   
   if (red_blue_ACTIVE_):
     shells = chk.run_RB_shells(names)
     # get full results: place, reds, blues
-    results = [[results[i]] + list(shells[names[i]]) for i in range(len(names))] 
+    results = [[results[i]] + list(shells[names[i]]) for i in range(len(names))]
 
-  data = [track]
   data += results
 
   return data  # full line
 
 
-def log(dict_path = PATH_TO_TRACK_DICT, comps_path=PATH_TO_COMPS):
-  names, n, path = setup(comps_path)
+def log(dict_path, comps_path, is_online=False):
+  names, n, path = setup(comps_path, is_online=is_online)
   i = 0
   while(i < n):
-    data = race_data(names, i, dict_path)
+    data = race_data(names, i, dict_path, is_online=is_online)
     line = create_line(data)
     add_line(line, path)  # write to path
-    i += 1  # increase i
+    
+    if (is_online):
+      n += 1  # increase n if playing online so never timeout
+    
+    i += 1
 
 
