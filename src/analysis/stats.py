@@ -3,10 +3,10 @@ from statistics import mode
 import matplotlib.pyplot as plt
 
 
-def get_avgs(name_data, tracks = [], track = 0):
+def get_avgs(name_data, tracks = [], track = 0, is_online=False):
   """
-  Gets the averages for the given players.
-  Returns dictionary with names -> averages (pos, reds, blues).
+  Gets the averages for the given players. Rating only returned for online.
+  Returns dictionary with names -> averages (pos, rating, reds, blues).
   If a certain track is given, that is checked specifically.
   """
   avgs = {}
@@ -21,16 +21,17 @@ def get_avgs(name_data, tracks = [], track = 0):
       data = name_data[name]
     
     avg = []
-    for i in range(3):   # TODO: len(name_data[name][0]), check what this is
+    n_fields = 3 + is_online  # TODO: len(name_data[name][0]), check what this is
+    for i in range(n_fields):
       avg.append(np.average(data.transpose()[i]))
     avgs[name] = avg  # now [avg_pos, avg_reds, avg_blues]
 
   return avgs
 
-def get_std_devs(name_data, tracks = [], track = 0):
+def get_std_devs(name_data, tracks = [], track = 0, is_online=False):
   """
-  Gets the standard deviations for the given players.
-  Returns dictionary with names -> standard deviations (pos, reds, blues).
+  Gets the standard deviations for the given players. Rating only returned for online.
+  Returns dictionary with names -> standard deviations (pos, rating, reds, blues).
   If a certain track is given, that is checked specifically.
   """
   stdds = {}
@@ -45,7 +46,8 @@ def get_std_devs(name_data, tracks = [], track = 0):
       data = name_data[name]
     
     stdd = []
-    for i in range(3):  # TODO check len(name_data[name][0])
+    n_fields = 3 + is_online  # TODO: len(name_data[name][0]), check what this is
+    for i in range(n_fields):
       stdd.append(np.std(data.transpose()[i]))
     
     stdds[name] = stdd
@@ -68,7 +70,7 @@ def get_best_worst_track(name_data, tracks, tracks_check, best=True):
     avgs = get_avgs(name_data, tracks, track)
     avgs_per_track[track] = {}  # initialise empty
     for name in names:  # write avg position for each name for that track
-      avgs_per_track[track][name] = avgs[name][0]
+      avgs_per_track[track][name] = avgs[name][0]  # 0th field is position
     
   min_max = {}
   if (best):

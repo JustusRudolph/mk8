@@ -4,21 +4,25 @@ from . import stats as st
 
 class Analysis:
 
-  def __init__(self, paths, track_dict, names=None):
+  def __init__(self, paths, track_dict, names=None, online=False):
     """
     paths: paths from which to get data
     names: List of names for which to check. Defaults to None
            and just uses all names from the given paths.
     """
-    tracks, name_data = rd.get_all_name_data(paths, names)
+
+    tracks, name_data, race_data = rd.get_all_name_data(paths, names, is_online=online)
 
     self.n_races = len(tracks)
     self.names = name_data.keys()
     self.tracks = tracks
     self.name_data = name_data
     self.track_dict = track_dict
+    
+    self.is_online = online
+    self.race_data = race_data  # only relevant for online
 
-    print(f"Setup of Analysis complete. {self.n_races} races have been played.")
+    print(f"Setup of Analysis complete. {self.n_races} races have been played.\n")
   
   def get_total_name_data(self, print_enabled=False):
     """
@@ -34,19 +38,41 @@ class Analysis:
 
     for name in self.names:
       pts = rd.get_points(self.name_data[name].transpose()[0])
-      n_reds = sum(self.name_data[name].transpose()[1])
-      n_blues = sum(self.name_data[name].transpose()[2])
-      data[name] = [pts, n_reds, n_blues]
-      data_per_game[name] = [float(pts)/self.n_races, float(n_reds)/self.n_races, 
-                             float(n_blues)/self.n_races]
+      n_reds = sum(self.name_data[name].transpose()[-2])  # Reds always 2nd last
+      n_blues = sum(self.name_data[name].transpose()[-1])  # Blues always last
+      
+      if (self.is_online):
+        d_rat = sum(self.name_data[name].transpose()[1])
+
+        data[name] = [pts, d_rat, n_reds, n_blues]
+        data_per_game[name] = [float(pts)/self.n_races, float(d_rat)/self.n_races,
+                               float(n_reds)/self.n_races, float(n_blues)/self.n_races]
+
+      else:
+        data[name] = [pts, n_reds, n_blues]
+        data_per_game[name] = [float(pts)/self.n_races, float(n_reds)/self.n_races,
+                               float(n_blues)/self.n_races]
+        
 
     if (print_enabled):
         for name in self.names:
+          # print totals
           print(f"{name} got {data[name][0]} points. Hit by red " +
-          f"{data[name][1]} times. Hit by blue {data[name][2]} times.")
+          f"{data[name][-2]} times. Hit by blue {data[name][-1]} times.", end='')
+          if (self.is_online):
+            print(f" Total rating change: {data[name][1]}")
+          
+          else:
+            print()  # still need newline
+          
+          # Now per game
           print("This corresponds to averages of: Score: "+
-                f"{data_per_game[name][0]:.2f}, Reds: {data_per_game[name][1]:.2f}"+
-                f", Blues: {data_per_game[name][2]:.2f}.\n")
+                f"{data_per_game[name][0]:.2f}, Reds: {data_per_game[name][-2]:.2f}"+
+                f", Blues: {data_per_game[name][-1]:.2f}.", end='')
+          if (self.is_online):
+            print(f" Rating change: {data_per_game[name][1]}.\n")
+          else:
+            print("\n")
         
         print("\n")  # Just add a newline at the end
 
@@ -150,8 +176,13 @@ class Analysis:
           print("Averages for all tracks:")
           for name in self.names:
             print(f"{name}:\nPosition: {avg[name][0]:.2f} +- {std[name][0]:.2f}"+
-                  f" || Reds: {avg[name][1]:.2f} +- {std[name][1]:.2f} || " +
-                  f"Blues: {avg[name][2]:.2f} +- {std[name][2]:.2f}")
+                  f" || Reds: {avg[name][-2]:.2f} +- {std[name][-2]:.2f} || " +
+                  f"Blues: {avg[name][-1]:.2f} +- {std[name][-1]:.2f}", end='')
+            
+            if (self.is_online):
+              print(f" || Rating change: {avg[name][1]:.2f} +- {std[name][1]:.2f}")
+            else:
+              print()
 
           print("\n")  # add newline at end
 
@@ -170,8 +201,13 @@ class Analysis:
           print(f"Averages for {self.track_dict[track]}:")
           for name in self.names:
             print(f"{name}:\nPosition: {avg[name][0]:.2f} +- {std[name][0]:.2f}" +
-                  f" || Reds: {avg[name][1]:.2f} +- {std[name][1]:.2f} || " +
-                  f"Blues: {avg[name][2]:.2f} +- {std[name][2]:.2f}")
+                  f" || Reds: {avg[name][-2]:.2f} +- {std[name][-2]:.2f} || " +
+                  f"Blues: {avg[name][-1]:.2f} +- {std[name][-1]:.2f}", end='')
+
+            if (self.is_online):
+              print(f" || Rating change: {avg[name][1]:.2f} +- {std[name][1]:.2f}")
+            else:
+              print()
 
           print("\n")  # add newline at end
       

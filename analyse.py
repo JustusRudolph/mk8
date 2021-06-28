@@ -11,9 +11,14 @@ from src.log import log_race as lr
 from src.analysis import analysis as an
 
 COMPS_PATH = "src/.comps/"
+COMPS_PATH_ON = "src/.comps_online/"
 
-def get_runs(today_only=False):
-  runs = [COMPS_PATH + run for run in os.listdir(COMPS_PATH)]  # all paths
+def get_runs(today_only=False, is_online=False):
+  
+  if (is_online):
+    runs = [COMPS_PATH_ON + run for run in os.listdir(COMPS_PATH_ON)]  # all paths
+  else:
+    runs = [COMPS_PATH + run for run in os.listdir(COMPS_PATH)]  # all paths
 
   today = str(date.today())
 
@@ -38,12 +43,17 @@ def print_prompts():
   print(total_string)
 
 def setup_analyse():
-  print("This is the Mario Kart track analyser.")
+  print("\nThis is the Mario Kart track analyser.\n")
 
-  runs = get_runs(input("Do you want to use the tracks only of today?[y/n]: ") == "y")
+  online = input("Do you want to see the statistics from Online?[y/n]: ") == "y"
+  today = input("Do you want to use the tracks only of today?[y/n]: ") == "y"
+  print()  # add an empty line
+
+  runs = get_runs(today_only=today, is_online=online)
+
   all_tracks = get_all_tracks()
   
-  analyse = an.Analysis(runs, all_tracks)
+  analyse = an.Analysis(runs, all_tracks, online=online)
   return analyse
 
 def run(analyse):
