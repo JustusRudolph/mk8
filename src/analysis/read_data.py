@@ -35,12 +35,16 @@ def get_points(places):
   tot = sum([PLACE_POINT[place] for place in places])
   return tot
 
-def get_all_name_data(paths, names=None):
+def get_all_name_data(paths, names=None, is_online=False):
   """
   Appends all the runs to each other to create larger data sets
   returns the array of all tracks, and a dictionary of name to positions
+  
+  Additionally, if the online flag is set to true, then race data
+  is also returned. This includes cc, if it is mirror, and number of players.
   """
   tracks = []
+  race_data = []
   name_data = {}
   names_init = False  # to check whether name entries in dictionary exists
 
@@ -53,13 +57,24 @@ def get_all_name_data(paths, names=None):
     full_data = get_data(path)
     if (not names_init):
       headers = full_data.columns
-      names = headers[1:]  # first will be track, from then on it's names
+      if (is_online):
+        names = headers[4:]  # track, cc, mirror, n_players, then it's names
+      else:
+        names = headers[1:]  # first will be track, from then on it's names
+
       for name in names:
         name_data[name] = []  # empty list initialised for every name
 
       names_init = True
 
     tracks += list(full_data["Track"])
+
+    if (is_online):  # add more data for all the races if online
+      for i in range(full_data.shape[0]):  # number of entries
+        race_data.append((full_data["CC"][i], full_data["Mirror"][i],
+        full_data["nPlayers"][i]
+        ))
+  
     for name in names:
       # ast used to make string to list representation
       name_data[name] += list(ast.literal_eval(entry) for entry in full_data[name])
@@ -67,4 +82,5 @@ def get_all_name_data(paths, names=None):
   for name in names:
     name_data[name] = np.array(name_data[name])
 
-  return tracks, name_data
+
+  return tracks, name_data, np.array(race_data)  # the latter will be empty for offline

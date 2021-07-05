@@ -95,7 +95,7 @@ def setup(relative_path, is_online=False):
   race.write("Track")  # first column are the tracks
 
   if (is_online):
-    race.write("; CC; Mirror; AvgRating")  # these fields are not necessary offline
+    race.write("; CC; Mirror; nPlayers")  # these fields are not necessary offline
 
   [race.write("; " + name) for name in names]  # add names to column headers
   race.close()
@@ -105,7 +105,7 @@ def setup(relative_path, is_online=False):
                                   "number of red and blue shells?[y/n]: ")
   return names, n_races, path
 
-def race_data(names, i, dict_path, is_online=False):
+def run_race_data(names, i, dict_path, is_online=False):
   """
   Regular Updating function for every race
   Returns the data for the new line to be added
@@ -118,19 +118,30 @@ def race_data(names, i, dict_path, is_online=False):
 
   if (is_online):  # Three fields only used in online
     cc, is_mirror = chk.run_cc()
-    avg_rat = chk.run_avg_rat()
+    n_players = chk.run_n_players()
     
     data.append(cc)
     data.append(int(is_mirror))
-    data.append(avg_rat)
+    data.append(n_players)
 
 
   results = chk.run_results(names)
   
+  if (is_online):
+    d_rats_dict = chk.run_d_rating(names)
+
+    # add last field to results: rating change
+    for i in range(len(names)):
+      temp = [results[i]]
+      temp.append(d_rats_dict[names[i]])
+      results[i] = temp  # This stuff is all necessary to avoid memory issues
+
   if (red_blue_ACTIVE_):
     shells = chk.run_RB_shells(names)
     # get full results: place, reds, blues
-    results = [[results[i]] + list(shells[names[i]]) for i in range(len(names))]
+    for i in range(len(names)):
+      results[i] += shells[names[i]]
+
 
   data += results
 
@@ -141,7 +152,7 @@ def log(dict_path, comps_path, is_online=False):
   names, n, path = setup(comps_path, is_online=is_online)
   i = 0
   while(i < n):
-    data = race_data(names, i, dict_path, is_online=is_online)
+    data = run_race_data(names, i, dict_path, is_online=is_online)
     line = create_line(data)
     add_line(line, path)  # write to path
     
