@@ -34,7 +34,7 @@ class Analysis:
 
     print(f"Setup of Analysis complete. {self.n_races} races have been played.\n")
   
-  def constrain_data(self, cc=ALLOWED_CCS, mirror=None, player_range=(2,12)):
+  def constrain_data(self, ccs=ALLOWED_CCS, mirror=None, player_range=(2,12)):
     """
     This is a simple function to constrain name data based on arguments
     given by the user. The constraints are based on the three fields 'cc',
@@ -59,10 +59,12 @@ class Analysis:
 
     if (not mirror):
       # then check the races with correct cc if mirror is not set to true
-      if (cc != ALLOWED_CCS):
-        assert(cc in ALLOWED_CCS)
-        ii_cc = np.where(np.array(self.race_data[:, 0]) == cc)[0]  # 0th index is cc value
-        ii = np.array([i for i in ii if i in ii_cc])  # keep those with the correct cc
+      if (ccs != ALLOWED_CCS):
+        ii_cc = []
+        for cc in ccs:
+          ii_cc += list(np.where(np.array(self.race_data[:, 0]) == cc)[0])  # 0th index is cc
+
+        ii = ii[ii_cc]  # select only those
       
     if ((player_range[0] > 2) or player_range[1] < 12):
       ii_del = []  # the indices to delete from ii. This is the INDEX of INDICES of RACES
@@ -373,4 +375,47 @@ class Analysis:
       st.plot_occurences([name_data[name].transpose()[i]], subheaders=[name], typ=typ)
 
     
+  def constrain_cc(self):
+    """
+    Function to be called from analyse.py to constrain the cc to only include
+    that which the user requests. Returns the ccs.
+    """
+    while (True):
+      ccs = input("Please enter the CCs you would like to keep: ").split()
+      ccs = [int(cc) for cc in ccs]
+      if (all([cc in ALLOWED_CCS for cc in ccs])):
+        return ccs
 
+      else:
+        print(f"Not all CCs you entered were accepted: {ccs}.")
+        print("Please try again.\n")
+
+  def constrain_mirror(self):
+    """
+    Function to be called from analyse.py to constrain the mirror flag to only include
+    that which the user requests. Returns the flag.
+    """
+    mirror = input("Set mirror flag to true?[y/n]: ")
+    return mirror == 'y'
+
+  def constrain_players(self):
+    """
+    Function to be called from analyse.py to constrain the number of players
+    to only include the range which the user requests. Returns the range.
+    """
+    while (True):
+      rng = input("Please enter a range of players: ").split()
+      rng = list(map(int, rng))
+
+      if (len(rng) > 2):
+        print("More than two arguments entered. Ignoring all but the first two.")
+      
+      low = max(rng[:2])
+      upp = min(rng[:2])
+
+      if ((low >= 2) and (upp <= 12)):
+        return (low, upp)
+
+      else:
+        print(f"Not acceptable range: ({low}, {upp}). Please try again.")
+        print("\n")
