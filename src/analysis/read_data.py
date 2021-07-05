@@ -83,4 +83,4 @@ def get_all_name_data(paths, names=None, is_online=False):
     name_data[name] = np.array(name_data[name])
 
 
-  return tracks, name_data, race_data  # the latter will be empty for offline
+  return tracks, name_data, np.array(race_data)  # the latter will be empty for offline

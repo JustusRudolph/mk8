@@ -45,7 +45,7 @@ def print_prompts():
 def setup_analyse():
   print("\nThis is the Mario Kart track analyser.\n")
 
-  online = input("Do you want to see the statistics from Online?[y/n]: ") == "y"
+  online = input("Do you want to see the statistics from online?[y/n]: ") == "y"
   today = input("Do you want to use the tracks only of today?[y/n]: ") == "y"
   print()  # add an empty line
 

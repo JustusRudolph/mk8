@@ -105,7 +105,7 @@ def setup(relative_path, is_online=False):
                                   "number of red and blue shells?[y/n]: ")
   return names, n_races, path
 
-def race_data(names, i, dict_path, is_online=False):
+def run_race_data(names, i, dict_path, is_online=False):
   """
   Regular Updating function for every race
   Returns the data for the new line to be added
@@ -152,7 +152,7 @@ def log(dict_path, comps_path, is_online=False):
   names, n, path = setup(comps_path, is_online=is_online)
   i = 0
   while(i < n):
-    data = race_data(names, i, dict_path, is_online=is_online)
+    data = run_race_data(names, i, dict_path, is_online=is_online)
     line = create_line(data)
     add_line(line, path)  # write to path
     
