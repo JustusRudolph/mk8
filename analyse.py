@@ -170,7 +170,8 @@ def run(analyse):
             play_rng = analyse.constrain_players()
 
           analyse.constrain_data(ccs=ccs, mirror=mirror, player_range=play_rng)
-          print("\n\n")  # just make some newlines for space        
+          print("\n\n")  # just make some newlines for space
+          break  # go out of while loop       
       
 
     elif (choice == '8'):
