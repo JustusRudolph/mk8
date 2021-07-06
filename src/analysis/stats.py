@@ -1,6 +1,7 @@
 import numpy as np
 from statistics import mode
 import matplotlib.pyplot as plt
+from numpy.core.numeric import full
 
 
 def get_avgs(name_data, tracks = [], track = 0, is_online=False):
@@ -120,7 +121,7 @@ def get_n_most_occuring(lst, n=1):
 
 def plot_occurences(data, subheaders=[], plot_tracks=False, typ="position", plt_total=False):
   """
-  Takes a 2d list/array and plots the number occurences of elements
+  Takes a 2d list of array and plots the number occurences of elements
   in each row. Different rows will be plotted next to each other.
   The subheaders field is required for the subplots in case of several rows.
   These will just appear on top of the plots.
@@ -129,18 +130,10 @@ def plot_occurences(data, subheaders=[], plot_tracks=False, typ="position", plt_
   """
   distinct_elems = []
   ns = []
-  for i in range(len(data)):
-    lst = list(data[i])  # ensure list to enable counting
-    #print(lst)
-    #input()
-    distinct_elems.append(list(set(lst)))
-    ns.append([])  # list of occurence of certain element
-    for elem in distinct_elems[i]:
-      #print(elem)
-      #input()
-      n = lst.count(elem)
-      ns[i].append(n)
-
+  for row in data:
+    unique, counts = np.unique(row, return_counts=True)
+    distinct_elems.append(list(unique))
+    ns.append(list(counts))
 
 
   if (plot_tracks):
@@ -177,17 +170,8 @@ def plot_occurences(data, subheaders=[], plot_tracks=False, typ="position", plt_
         ax1.set_title("Individual")
 
       if (plt_total):
-        # now get total data:
-        all_distincts = []
-        for dist in distinct_elems:
-          for elem in dist:
-            if elem not in all_distincts:
-              all_distincts.append(elem)
-
-        all_ns = np.zeros(len(all_distincts), dtype=np.int64)
-        for ns_for_each in ns:
-          for i in range(len(ns_for_each)):
-            all_ns[i] += ns_for_each[i]
+        full_data = np.reshape(data, np.size(data))  # all the data
+        all_distincts, all_ns = np.unique(full_data, return_counts=True)
 
         ax2.plot(all_distincts, all_ns, "ko")
         ax2.set(xlabel=f"Occurence of {typ}", ylabel="Frequency")

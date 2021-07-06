@@ -31,7 +31,7 @@ def get_all_tracks():
     all_tracks = lr.get_tracks("src/data/tracks.csv")  # dictionary of tracks
     return all_tracks
 
-def print_prompts():
+def print_prompts(analyse):
   total_string =  "Get data for each player:                        [1]\n"
   total_string += "Get favourite and least favourite tracks:        [2]\n"
   total_string += "Get the most frequent tracks:                    [3]\n"
@@ -39,9 +39,10 @@ def print_prompts():
   total_string += "Get the average and standard deviation of full\n"
   total_string += "data (position, reds, blues) for each player:    [5]\n"
   total_string += "Plot occurences of tracks, positions or shells:  [6]\n"
-  total_string += "\nThe following are for online racing only:\n"
-  total_string += "Add constraints to data:                         [7]\n"
-  total_string += "Toggle constrained data usage:                   [8]\n\n"
+  if (analyse.is_online):  # add those two options only if online data is used 
+    total_string += "\nThe following are for online racing only:\n"
+    total_string += "Add constraints to data:                         [7]\n"
+    total_string += "Toggle constrained data usage:                   [8]\n\n"
   total_string += "Quit:                                            [q]\n"
   print(total_string)
 
@@ -70,12 +71,15 @@ def setup_analyse():
 def run(analyse):
   quit = False
   constrained = False
-  choices = ['1','2','3','4','5','6','7','8','q']  # current acceptable choices
+  choices = ['q','1','2','3','4','5','6']  # current acceptable choices
+  if (analyse.is_online):
+    choices += ['7','8']  # these are only acceptable for online
+  
   while (not quit):
     choice = 0
     while (choice not in choices):
       print("Hi! What do you want to do?")
-      print_prompts()
+      print_prompts(analyse)
       choice = input("Choose one of these options[1-6] or quit[q]: ")
       if (choice not in choices):
         print(f"Not recognised choice {choice}. Please try again.")
@@ -122,11 +126,17 @@ def run(analyse):
         analyse.plot_track_occurences(constr=constrained)
     
       else:
-        types = {'p': "position", 'r': "red", 'b': "blue"}
+        types = {'p': "position", 'r': "red", 'b': "blue", 'd': "drating"}
         print("Okay, opting to plot data instead.")
         tp = 0
         while (tp not in types.keys()):
-          tp = input("What do you want to plot? Positions, reds or blues?[p/r/b]: ")
+          prompt = "What do you want to plot? Positions, "
+          if (analyse.is_online):
+            prompt += "difference in rating, reds or blues?[p/d/r/b]: "
+          else:
+            prompt += "reds or blues?[p/r/b]: "
+          tp = input(prompt)
+
           if (tp not in types.keys()):
             print(f"Not recognised type to plot: {tp}. Please try again.")
         

@@ -49,6 +49,9 @@ class Analysis:
     This function writes over self.constr_* fields which can then be
     accessed by other functions.
     """
+    print("In constrain_data in analysis.py")
+    print(f"ccs: {ccs}, mirror: {mirror}, range: {player_range}")
+
     assert(self.is_online)  # this should only be called with online
     ii = np.arange(self.n_races)  # baseline is no constraint
 
@@ -72,18 +75,18 @@ class Analysis:
       for i in range(self.n_races):
         n_players = self.race_data[i][2]  # nPlayers is the 2nd field (CC, Mirror, nPlayers)
 
-        if (n_players <= player_range[0]) or (n_players >= player_range[1]):  # if outside bounds
+        if (n_players < player_range[0]) or (n_players > player_range[1]):  # if outside bounds
           ii_del.append(np.where(ii == i)[0][0])  # the index of the index stored in ii
 
       ii = np.delete(ii, ii_del)  # deletes the necessary indices from the list of indices
 
-
-    iis_to_delete = np.delete(np.arange(self.n_races), ii)  # ii are the races to keep
-
     for name in self.names:
-      self.constr_name_data[name] = np.delete(self.name_data[name], iis_to_delete)
+      self.constr_name_data[name] = self.name_data[name][ii]  # select those indives
 
-    self.constr_race_data = np.delete(self.race_data, iis_to_delete)
+    self.constr_race_data = self.race_data[ii]
+
+    print(f"\nName_data: {self.constr_name_data}")
+    input()
 
     self.constr_tracks = [self.tracks[i] for i in ii]
 
@@ -343,23 +346,35 @@ class Analysis:
     If no name is given, then occurences of everyone
     is plotted.
     The typ indicates what is to be plotted. Allowed values
-    are "position", "red", "blue"
+    are "position", "red", "blue" and "drating" in case of online
     """
     if (typ == "position"):
       i = 0
     elif (typ == "red"):
-      i = 1
+      i = -2
     elif (typ == "blue"):
-      i = 2
+      i = -1
+    elif (typ == "drating" and self.is_online):
+      i = 1
+    elif (typ == "rating"):  # this will only be if not online
+      print("Cannot choose rating change because these races are not online. " +
+            "Please try again")
+      return -2
     else:
-      print(f"{typ} is not an accepted type of data. Choose from:" +
-            "\"position\", \"red\", \"blue\"")
+      to_print = f"{typ} is not an accepted type of data. "
+      to_print += "Choose from: \"position\", \"red\", \"blue\""
+      to_print += ", \"rating change\"" * self.is_online
+      print()
       return -1
 
     if (constr):
       name_data = self.constr_name_data
     else:
       name_data = self.name_data
+
+    # print("Name_data in plot_data_occurences in analysis.py")
+    # print(name_data)
+    # input()
 
     if (not name):
       data = []
@@ -410,8 +425,8 @@ class Analysis:
       if (len(rng) > 2):
         print("More than two arguments entered. Ignoring all but the first two.")
       
-      low = max(rng[:2])
-      upp = min(rng[:2])
+      low = min(rng[:2])
+      upp = max(rng[:2])
 
       if ((low >= 2) and (upp <= 12)):
         return (low, upp)

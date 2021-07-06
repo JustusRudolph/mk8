@@ -115,6 +115,21 @@ def run_tracks(tracks):
 
   return track
 
+def run_init_ratings(names):
+  """
+  Asks user for the initial ratings of every player. This will only
+  be called in online racing.
+  """
+  while(True):
+    ratings = input(f"Initial ratings for {str(names)[1:-1]}: ").split()
+    try:
+      ratings_int = list(map(int, ratings))
+      return ratings_int
+
+    except ValueError:
+      print("Non-integer entered. Please try again.\n")
+
+
 def run_results(names):
   """
   Asks user for result input. Returns them as list of integers for positions
