@@ -96,6 +96,10 @@ def setup(relative_path, is_online=False):
 
   if (is_online):
     race.write("; CC; Mirror; nPlayers")  # these fields are not necessary offline
+    ratings = chk.run_init_ratings(names)  # write these separately
+    data = [path, names, ratings]
+    line = create_line(data)
+    add_line(line, "src/data/init_ratings.csv")
 
   [race.write("; " + name) for name in names]  # add names to column headers
   race.close()
