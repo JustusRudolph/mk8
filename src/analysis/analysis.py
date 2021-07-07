@@ -282,8 +282,8 @@ class Analysis:
       tracks = self.tracks
 
     if (not track):
-      avg = st.get_avgs(name_data)
-      std = st.get_std_devs(name_data)
+      avg = st.get_avgs(name_data, is_online=self.is_online)
+      std = st.get_std_devs(name_data, is_online=self.is_online)
 
       if (print_enabled):
           print("Averages for all tracks:")
