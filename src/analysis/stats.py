@@ -12,6 +12,7 @@ def get_avgs(name_data, tracks = [], track = 0, is_online=False):
   """
   avgs = {}
   names = name_data.keys()
+  n_fields = len(list(name_data.values())[0][0])  # number of fields, 4 online, 3 offline atm
   for name in names:
     if (track and len(tracks)):  # only if both are given we check for specific track
       ii = np.where(np.array(tracks) == track)[0]  # get indices of track
@@ -22,7 +23,6 @@ def get_avgs(name_data, tracks = [], track = 0, is_online=False):
       data = name_data[name]
     
     avg = []
-    n_fields = 3 + is_online  # TODO: len(name_data[name][0]), check what this is
     for i in range(n_fields):
       avg.append(np.average(data.transpose()[i]))
     avgs[name] = avg  # now [avg_pos, avg_reds, avg_blues]
@@ -37,6 +37,7 @@ def get_std_devs(name_data, tracks = [], track = 0, is_online=False):
   """
   stdds = {}
   names = name_data.keys()
+  n_fields = len(list(name_data.values())[0][0])  # number of fields, 4 online, 3 offline atm
   for name in names:
     if (track and len(tracks)):  # only if both are given we check for specific track
       ii = np.where(np.array(tracks) == track)[0]  # get indices of track
@@ -47,7 +48,6 @@ def get_std_devs(name_data, tracks = [], track = 0, is_online=False):
       data = name_data[name]
     
     stdd = []
-    n_fields = 3 + is_online  # TODO: len(name_data[name][0]), check what this is
     for i in range(n_fields):
       stdd.append(np.std(data.transpose()[i]))
     
