@@ -94,30 +94,28 @@ def get_best_worst_track(name_data, tracks, tracks_check, best=True):
 
   return (best_tracks, min_max)  # best_tracks can be "worst tracks" too
 
-def get_n_most_occuring(lst, n=1):
+def get_n_most_least_occuring(arr, n=1, most=True):
   """
   Gets the n most occuring objects in list (or more if there are duplicates)
   Returns dictionary of object (from lst) -> number of its occurences in lst.
   """
-  lst = list(lst)  # assert that it is a list not a numpy array
-  assert(n <= len(lst))
-  most_occ = {}
-  lst_distinct = list(set(lst))
-  n_occ = {}
-  for elem in lst_distinct:
-    n_occ[elem] = lst.count(elem)
+  distinct, counts = np.unique(arr, return_counts=True)
+  # if user submitted n is larger than the number of distinct values or a negative or 0, return all
+  if ((n < 1) or (n > len(distinct))):
+    n = len(distinct)
 
-  i = 0
-  while (i < n):  # get n modes now
-    mx = max(n_occ.values())
-    elems_mx = list(set([elem for elem in lst_distinct if n_occ[elem] == mx]))  # all tracks w/ max
-    for elem in elems_mx:
-      most_occ[elem] = n_occ[elem]
-      n_occ.pop(elem)  # remove this to find next maxes
-      lst_distinct.remove(elem)  # so we don't check for it again
-      i += 1  # increment for every element returned
+  sorted_indices = np.argsort(counts)  # sort ascending by count, these are the indices
 
-  return most_occ
+  if (most):
+    # make it descending by flipping it
+    top_sorted_indices = np.flip(sorted_indices[-n:])  # ascending so n last have largest count
+  else:
+    top_sorted_indices = sorted_indices[:n]  # ascending so n first have lowest count
+
+  # track to count dict
+  sorted_dict = dict(zip(distinct[top_sorted_indices], counts[top_sorted_indices]))
+
+  return sorted_dict
 
 def plot_occurences(data, subheaders=[], plot_tracks=False, typ="position", plt_total=False):
   """

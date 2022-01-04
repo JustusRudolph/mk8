@@ -195,13 +195,14 @@ class Analysis:
     else:
       return best_tracks, pos
 
-  def get_n_freq_tracks(self, n, print_enabled=False, constr=False):
+  def get_most_least_freq_tracks(self, n, print_enabled=False, constr=False, top=True):
     """
     Get the n most frequent tracks from central data.
-    print_enabled can be set by user if print is requested. This
-    will mean that nothing is returned either.
+    print_enabled can be set by user if print is requested.
+    This will mean that nothing is returned either.
 
-    constr field is to ensure user can select constrained or full data
+    constr flag is to ensure user can select constrained or full data
+    top flag sets whether to get to most or least frequent
     """
     if (constr):
       tracks = self.constr_tracks
@@ -209,18 +210,20 @@ class Analysis:
     else:
       tracks = self.tracks
 
-    common_tracks = st.get_n_most_occuring(tracks, n)
+    if ((n < 1) or (n > len(self.track_dict)) and print_enabled):
+      print(f"\nOut of range n={n}. Showing frequencies of all tracks played.\n")
+
+    freq_tracks = st.get_n_most_least_occuring(tracks, n, most=top)
     
     if (print_enabled):
-      common_tracks_full = {}
-      for trk in common_tracks.keys():
-        common_tracks_full[self.track_dict[trk]] = common_tracks[trk]
+      freq_tracks_full = {}
+      for trk in freq_tracks.keys():
+        freq_tracks_full[self.track_dict[trk]] = freq_tracks[trk]
       
-      print(f"Most played track(s): {common_tracks_full}.\n\n")
-
+      print("Most"*top + "Least"*(1-top) + f" played track(s): {freq_tracks_full}.\n\n")
 
     else:
-      return common_tracks
+      return freq_tracks
 
   def tracks_played(self, print_enabled=False, print_played=False, constr=False):
     """

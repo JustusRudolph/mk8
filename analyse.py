@@ -34,7 +34,7 @@ def get_all_tracks():
 def print_prompts(analyse):
   total_string =  "Get data for each player:                        [1]\n"
   total_string += "Get favourite and least favourite tracks:        [2]\n"
-  total_string += "Get the most frequent tracks:                    [3]\n"
+  total_string += "Get the most or least frequent tracks:           [3]\n"
   total_string += "Get which tracks have been played/not played:    [4]\n"
   total_string += "Get the average and standard deviation of full\n"
   total_string += "data (position, reds, blues) for each player:    [5]\n"
@@ -53,6 +53,23 @@ def print_constraint_prompts():
   total_string += "Number of players:   [3]\n"
   total_string += "Return to main menu: [r]\n"
   print(total_string)
+
+def catch_int_input_error(prompt):
+  """
+  Simple function to catch a conversion error to integer from an input statement
+  """
+  accepted = False
+  val = 0  # probably not necessary since this is python, but feels wrong to not initialise
+  while (not accepted):
+    inp = input(prompt)
+    try:
+      val = int(inp)
+      accepted = True
+  
+    except ValueError:
+      print(f"Your input \"{inp}\" could not be read as an integer. Please try again.")
+
+  return val
 
 def setup_analyse():
   print("\nThis is the Mario Kart track analyser.\n")
@@ -94,9 +111,13 @@ def run(analyse):
       analyse.get_fav_tracks(print_enabled=True, best=False, constr=constrained)
 
     elif (choice == '3'):
-      # TODO(Justus) Check that only ints are accepted
-      n = int(input("Number of most common tracks you want to see: "))
-      analyse.get_n_freq_tracks(n, print_enabled=True, constr=constrained)
+      most_freq = input("Do you want to see the most frequent tracks?[y/n]: ") == "y"
+      if (not most_freq):
+        print("Okay. Checking least frequent instead.")
+
+      n = catch_int_input_error("Number of tracks you want to see: ")
+
+      analyse.get_most_least_freq_tracks(n, print_enabled=True, constr=constrained, top=most_freq)
 
     elif (choice == '4'):
       val = input("Do you want to see the tracks played?[y/n]: ")
