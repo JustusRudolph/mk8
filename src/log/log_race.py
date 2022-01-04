@@ -144,8 +144,9 @@ def run_race_data(names, i, dict_path, is_online=False):
     shells = chk.run_RB_shells(names)
     # get full results: place, reds, blues
     for i in range(len(names)):
-      results[i] += shells[names[i]]
-
+      temp = [results[i]]
+      temp += shells[names[i]]
+      results = temp
 
   data += results
 
